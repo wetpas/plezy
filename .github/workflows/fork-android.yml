@@ -1,0 +1,124 @@
+name: Fork – Android-Build
+
+# Nur für den Fork wetpas/plezy. Baut eine eigene App („Plezy Fork“), die sich neben der
+# offiziellen Plezy installieren lässt. Keine Releases, kein Sentry, keine Update-Prüfung
+# gegen das Original. Die Original-Dateien werden nur hier im Build angepasst, nicht im
+# Repo – so bleiben Updates von upstream konfliktfrei.
+
+on:
+  push:
+    branches: [wetpas]
+  workflow_dispatch:
+
+concurrency:
+  group: fork-android-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: "3.47.1"
+  FORK_APP_ID: com.edde746.plezy.fork
+  FORK_APP_LABEL: Plezy Fork
+
+jobs:
+  android:
+    if: github.repository == 'wetpas/plezy'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Java
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+          pub-cache: false
+
+      - name: Cache Pub
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: ~/.pub-cache
+          key: fork-${{ runner.os }}-pub-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
+
+      - name: Cache Gradle
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: fork-${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Install dependencies
+        run: flutter pub get --enforce-lockfile --no-example
+
+      - name: Eigene App-Identität setzen
+        shell: bash
+        run: |
+          set -euo pipefail
+          swap() { # Datei, alt, neu – bricht ab, wenn upstream die Stelle geändert hat
+            grep -qF -- "$2" "$1" || { echo "::error file=$1::'$2' nicht gefunden – upstream hat sich geändert"; exit 1; }
+            sed -i "s|$2|$3|g" "$1"
+          }
+          swap android/app/build.gradle.kts 'applicationId = "com.edde746.plezy"' "applicationId = \"$FORK_APP_ID\""
+          swap android/app/src/main/AndroidManifest.xml 'android:label="Plezy"' "android:label=\"$FORK_APP_LABEL\""
+          # Feste Content-Provider-Namen: zwei Apps mit gleichem Namen lassen sich nicht nebeneinander installieren.
+          swap android/app/src/main/AndroidManifest.xml '"com.edde746.plezy.fileprovider"' "\"$FORK_APP_ID.fileprovider\""
+          swap android/app/src/main/AndroidManifest.xml '"com.edde746.plezy.systemshelf.artwork"' "\"$FORK_APP_ID.systemshelf.artwork\""
+          swap android/app/src/main/kotlin/com/edde746/plezy/ExternalPlayerChannel.kt '"com.edde746.plezy.fileprovider"' "\"$FORK_APP_ID.fileprovider\""
+          swap android/app/src/main/kotlin/com/edde746/plezy/watchnext/SystemShelfArtworkProvider.kt '"com.edde746.plezy.systemshelf.artwork"' "\"$FORK_APP_ID.systemshelf.artwork\""
+          if grep -rnE '"com\.edde746\.plezy\.(fileprovider|systemshelf\.artwork)"' android/app/src/main; then
+            echo "::error::Original-Provider-Name noch vorhanden – App würde mit der offiziellen Plezy kollidieren"
+            exit 1
+          fi
+
+      - name: Signatur einrichten
+        shell: bash
+        env:
+          KS_B64: ${{ secrets.FORK_ANDROID_KEYSTORE_B64 }}
+          KS_PW: ${{ secrets.FORK_ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "${KS_B64:-}" ] || [ -z "${KS_PW:-}" ]; then
+            echo "::warning::Keine Fork-Signatur hinterlegt – Debug-Signatur, jedes Update braucht eine Neuinstallation"
+            exit 0
+          fi
+          umask 077
+          printf '%s' "$KS_B64" | base64 --decode > android/app/fork-release.jks
+          printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=fork\nstoreFile=fork-release.jks\n' "$KS_PW" "$KS_PW" > android/key.properties
+
+      - name: Build APKs
+        run: flutter build apk --release --split-per-abi --dart-define=GIT_COMMIT=${{ github.sha }}
+
+      - name: Signatur entfernen
+        if: always()
+        run: rm -f android/app/fork-release.jks android/key.properties
+
+      - name: APKs benennen
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            cp "build/app/outputs/flutter-apk/app-$abi-release.apk" "out/plezy-fork-$abi.apk"
+          done
+          ls -lh out
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: plezy-fork-android-${{ github.sha }}
+          path: out/*.apk
+          retention-days: 14
+          if-no-files-found: error
