@@ -115,10 +115,28 @@ jobs:
           done
           ls -lh out
 
-      - name: Upload APKs
+      # archive: false → jede APK ist direkt als .apk herunterladbar (kein Zip, aufs Handy tauglich).
+      # Der Dateiname ist dabei der Artefakt-Name.
+      - name: Upload APK arm64-v8a (Handy, neuere TV-Geräte)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: plezy-fork-android-${{ github.sha }}
-          path: out/*.apk
+          path: out/plezy-fork-arm64-v8a.apk
+          archive: false
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload APK armeabi-v7a (32-Bit-TV-Boxen)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          path: out/plezy-fork-armeabi-v7a.apk
+          archive: false
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload APK x86_64 (Emulator)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          path: out/plezy-fork-x86_64.apk
+          archive: false
           retention-days: 14
           if-no-files-found: error

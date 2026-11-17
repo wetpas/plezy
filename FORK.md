@@ -17,7 +17,8 @@ Upstream übernehmen: `git sync`, dann `git switch wetpas && git merge main`.
 
 `.github/workflows/fork-android.yml` baut bei jedem Push auf `wetpas` die APKs („Plezy Fork“, App-ID
 `com.edde746.plezy.fork`). Sie lassen sich neben der offiziellen Plezy installieren. Download unter
-*Actions → Fork – Android-Build → Artifacts* (14 Tage verfügbar).
+*Actions → Fork – Android-Build → Lauf → Artifacts*: jede APK einzeln als `.apk`, direkt aufs Handy (14 Tage verfügbar,
+GitHub-Login nötig).
 
 - `arm64-v8a`: aktuelle Handys und die meisten neueren TV-Geräte
 - `armeabi-v7a`: ältere bzw. 32-Bit-TV-Boxen (z. B. viele Google-TV-Sticks)
