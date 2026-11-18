@@ -63,25 +63,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile --no-example
 
-      - name: Eigene App-Identität setzen
-        shell: bash
-        run: |
-          set -euo pipefail
-          swap() { # Datei, alt, neu – bricht ab, wenn upstream die Stelle geändert hat
-            grep -qF -- "$2" "$1" || { echo "::error file=$1::'$2' nicht gefunden – upstream hat sich geändert"; exit 1; }
-            sed -i "s|$2|$3|g" "$1"
-          }
-          swap android/app/build.gradle.kts 'applicationId = "com.edde746.plezy"' "applicationId = \"$FORK_APP_ID\""
-          swap android/app/src/main/AndroidManifest.xml 'android:label="Plezy"' "android:label=\"$FORK_APP_LABEL\""
-          # Feste Content-Provider-Namen: zwei Apps mit gleichem Namen lassen sich nicht nebeneinander installieren.
-          swap android/app/src/main/AndroidManifest.xml '"com.edde746.plezy.fileprovider"' "\"$FORK_APP_ID.fileprovider\""
-          swap android/app/src/main/AndroidManifest.xml '"com.edde746.plezy.systemshelf.artwork"' "\"$FORK_APP_ID.systemshelf.artwork\""
-          swap android/app/src/main/kotlin/com/edde746/plezy/ExternalPlayerChannel.kt '"com.edde746.plezy.fileprovider"' "\"$FORK_APP_ID.fileprovider\""
-          swap android/app/src/main/kotlin/com/edde746/plezy/watchnext/SystemShelfArtworkProvider.kt '"com.edde746.plezy.systemshelf.artwork"' "\"$FORK_APP_ID.systemshelf.artwork\""
-          if grep -rnE '"com\.edde746\.plezy\.(fileprovider|systemshelf\.artwork)"' android/app/src/main; then
-            echo "::error::Original-Provider-Name noch vorhanden – App würde mit der offiziellen Plezy kollidieren"
-            exit 1
-          fi
+      - name: Fork-Name und App-ID setzen
+        run: bash scripts/fork/branding.sh android
 
       - name: Signatur einrichten
         shell: bash

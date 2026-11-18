@@ -82,16 +82,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile --no-example
 
-      - name: Eigene App-Identität setzen
-        shell: bash
-        run: |
-          set -euo pipefail
-          swap() { # Datei, alt, neu – bricht ab, wenn upstream die Stelle geändert hat
-            grep -qF -- "$2" "$1" || { echo "::error file=$1::'$2' nicht gefunden – upstream hat sich geändert"; exit 1; }
-            sed -i "s|$2|$3|g" "$1"
-          }
-          swap linux/CMakeLists.txt 'set(APPLICATION_ID "com.edde746.plezy")' "set(APPLICATION_ID \"$FORK_APP_ID\")"
-          swap linux/packaging/com.edde746.plezy.desktop 'Name=Plezy' "Name=$FORK_APP_LABEL"
+      - name: Fork-Name und App-ID setzen
+        run: bash scripts/fork/branding.sh linux
 
       - name: Build Linux x64
         env:
