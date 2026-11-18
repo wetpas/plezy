@@ -93,6 +93,7 @@ class TranslationsDe extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$seerr$de seerr = _Translations$seerr$de._(_root);
 	@override late final _Translations$services$de services = _Translations$services$de._(_root);
 	@override late final _Translations$addServer$de addServer = _Translations$addServer$de._(_root);
+	@override late final _Translations$forkFeedback$de forkFeedback = _Translations$forkFeedback$de._(_root);
 }
 
 // Path: app
@@ -2457,6 +2458,49 @@ class _Translations$addServer$de extends Translations$addServer$en {
 	@override String redirectDifferentHost({required Object product}) => 'Der Server hat zu einem anderen Host weitergeleitet. Gib die endgültige ${product}-URL direkt ein.';
 	@override String get redirectInsecure => 'Der Server hat von HTTPS zu einer unsicheren URL weitergeleitet';
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'Der Server hat zu einer nicht unterstützten URL weitergeleitet. Gib die endgültige ${product}-URL direkt ein.';
+}
+
+// Path: forkFeedback
+class _Translations$forkFeedback$de extends Translations$forkFeedback$en {
+	_Translations$forkFeedback$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get reportProblem => 'Problem melden';
+	@override String get reportProblemDescription => 'Fehler oder Wunsch an den Betreuer dieser Version senden';
+	@override String get kindBug => 'Fehler';
+	@override String get kindWish => 'Wunsch';
+	@override String get descriptionLabel => 'Was ist passiert?';
+	@override String get descriptionHint => 'Beschreibe das Problem oder deinen Wunsch';
+	@override String get descriptionRequired => 'Bitte beschreibe kurz, was passiert ist.';
+	@override String get intentLabel => 'Was wolltest du tun? (optional)';
+	@override String get nameLabel => 'Dein Name (optional)';
+	@override String get attachImage => 'Bild anhängen';
+	@override String attachImageCount({required Object count, required Object max}) => '${count} von ${max} angehängt';
+	@override String imageNumber({required Object number}) => 'Bild ${number}';
+	@override String get removeImage => 'Bild entfernen';
+	@override String get includeLog => 'App-Protokoll mitsenden';
+	@override String get includeLogDescription => 'Die letzten Protokollzeilen helfen bei der Fehlersuche. Tokens, Passwörter und Serveradressen werden entfernt.';
+	@override String get send => 'Senden';
+	@override String get sending => 'Wird gesendet…';
+	@override String get sentTitle => 'Meldung gesendet';
+	@override String get sentMessage => 'Danke! Deine Meldung ist angekommen.';
+	@override String get reference => 'Referenz';
+	@override String get errorUnreachable => 'Der Server ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut – dein Text bleibt erhalten.';
+	@override String get errorRejected => 'Der Server hat die Meldung nicht angenommen.';
+	@override String errorRejectedDetail({required Object detail}) => 'Der Server hat die Meldung nicht angenommen: ${detail}';
+	@override String get errorUnauthorized => 'Diese Version darf keine Meldungen senden (Zugangsschlüssel abgelehnt).';
+	@override String get errorTooLarge => 'Die Meldung ist zu groß. Entferne Bilder und versuche es erneut.';
+	@override String get errorThrottled => 'Im Moment zu viele Meldungen. Bitte versuche es später erneut.';
+	@override String errorThrottledMinutes({required Object minutes}) => 'Im Moment zu viele Meldungen. Versuche es in etwa ${minutes} Min. erneut.';
+	@override String errorServer({required Object code}) => 'Der Server hat einen Fehler gemeldet (${code}). Bitte versuche es später erneut.';
+	@override String get errorUnexpected => 'Die Meldung konnte nicht gesendet werden. Bitte versuche es erneut.';
+	@override String errorUnexpectedCode({required Object code}) => 'Die Meldung konnte nicht gesendet werden (${code}). Bitte versuche es erneut.';
+	@override String imageLimit({required Object max}) => 'Höchstens ${max} Bilder pro Meldung.';
+	@override String get imageNotAnImage => 'Diese Datei ist kein unterstütztes Bild (PNG, JPEG oder WebP).';
+	@override String get imageTooLarge => 'Dieses Bild ist zu groß (max. 8 MB).';
+	@override String get imageUnreadable => 'Das Bild konnte nicht gelesen werden.';
 }
 
 // Path: appIcon.names
@@ -5709,6 +5753,40 @@ extension on TranslationsDe {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'Der Server hat zu einem anderen Host weitergeleitet. Gib die endgültige ${product}-URL direkt ein.',
 			'addServer.redirectInsecure' => 'Der Server hat von HTTPS zu einer unsicheren URL weitergeleitet',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'Der Server hat zu einer nicht unterstützten URL weitergeleitet. Gib die endgültige ${product}-URL direkt ein.',
+			'forkFeedback.reportProblem' => 'Problem melden',
+			'forkFeedback.reportProblemDescription' => 'Fehler oder Wunsch an den Betreuer dieser Version senden',
+			'forkFeedback.kindBug' => 'Fehler',
+			'forkFeedback.kindWish' => 'Wunsch',
+			'forkFeedback.descriptionLabel' => 'Was ist passiert?',
+			'forkFeedback.descriptionHint' => 'Beschreibe das Problem oder deinen Wunsch',
+			'forkFeedback.descriptionRequired' => 'Bitte beschreibe kurz, was passiert ist.',
+			'forkFeedback.intentLabel' => 'Was wolltest du tun? (optional)',
+			'forkFeedback.nameLabel' => 'Dein Name (optional)',
+			'forkFeedback.attachImage' => 'Bild anhängen',
+			'forkFeedback.attachImageCount' => ({required Object count, required Object max}) => '${count} von ${max} angehängt',
+			'forkFeedback.imageNumber' => ({required Object number}) => 'Bild ${number}',
+			'forkFeedback.removeImage' => 'Bild entfernen',
+			'forkFeedback.includeLog' => 'App-Protokoll mitsenden',
+			'forkFeedback.includeLogDescription' => 'Die letzten Protokollzeilen helfen bei der Fehlersuche. Tokens, Passwörter und Serveradressen werden entfernt.',
+			'forkFeedback.send' => 'Senden',
+			'forkFeedback.sending' => 'Wird gesendet…',
+			'forkFeedback.sentTitle' => 'Meldung gesendet',
+			'forkFeedback.sentMessage' => 'Danke! Deine Meldung ist angekommen.',
+			'forkFeedback.reference' => 'Referenz',
+			'forkFeedback.errorUnreachable' => 'Der Server ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut – dein Text bleibt erhalten.',
+			'forkFeedback.errorRejected' => 'Der Server hat die Meldung nicht angenommen.',
+			'forkFeedback.errorRejectedDetail' => ({required Object detail}) => 'Der Server hat die Meldung nicht angenommen: ${detail}',
+			'forkFeedback.errorUnauthorized' => 'Diese Version darf keine Meldungen senden (Zugangsschlüssel abgelehnt).',
+			'forkFeedback.errorTooLarge' => 'Die Meldung ist zu groß. Entferne Bilder und versuche es erneut.',
+			'forkFeedback.errorThrottled' => 'Im Moment zu viele Meldungen. Bitte versuche es später erneut.',
+			'forkFeedback.errorThrottledMinutes' => ({required Object minutes}) => 'Im Moment zu viele Meldungen. Versuche es in etwa ${minutes} Min. erneut.',
+			'forkFeedback.errorServer' => ({required Object code}) => 'Der Server hat einen Fehler gemeldet (${code}). Bitte versuche es später erneut.',
+			'forkFeedback.errorUnexpected' => 'Die Meldung konnte nicht gesendet werden. Bitte versuche es erneut.',
+			'forkFeedback.errorUnexpectedCode' => ({required Object code}) => 'Die Meldung konnte nicht gesendet werden (${code}). Bitte versuche es erneut.',
+			'forkFeedback.imageLimit' => ({required Object max}) => 'Höchstens ${max} Bilder pro Meldung.',
+			'forkFeedback.imageNotAnImage' => 'Diese Datei ist kein unterstütztes Bild (PNG, JPEG oder WebP).',
+			'forkFeedback.imageTooLarge' => 'Dieses Bild ist zu groß (max. 8 MB).',
+			'forkFeedback.imageUnreadable' => 'Das Bild konnte nicht gelesen werden.',
 			_ => null,
 		};
 	}

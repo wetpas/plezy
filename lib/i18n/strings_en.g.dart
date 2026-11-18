@@ -95,6 +95,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$services$en services = Translations$services$en.internal(_root);
 	late final Translations$addServer$en addServer = Translations$addServer$en.internal(_root);
 	late final Translations$deepLinks$en deepLinks = Translations$deepLinks$en.internal(_root);
+	late final Translations$forkFeedback$en forkFeedback = Translations$forkFeedback$en.internal(_root);
 }
 
 // Path: app
@@ -6173,6 +6174,117 @@ class Translations$deepLinks$en {
 	String get copied => 'Link copied';
 }
 
+// Path: forkFeedback
+class Translations$forkFeedback$en {
+	Translations$forkFeedback$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Report a problem'
+	String get reportProblem => 'Report a problem';
+
+	/// en: 'Send a bug or a wish to the maintainer of this build'
+	String get reportProblemDescription => 'Send a bug or a wish to the maintainer of this build';
+
+	/// en: 'Bug'
+	String get kindBug => 'Bug';
+
+	/// en: 'Wish'
+	String get kindWish => 'Wish';
+
+	/// en: 'What happened?'
+	String get descriptionLabel => 'What happened?';
+
+	/// en: 'Describe the problem or your wish'
+	String get descriptionHint => 'Describe the problem or your wish';
+
+	/// en: 'Please describe briefly what happened.'
+	String get descriptionRequired => 'Please describe briefly what happened.';
+
+	/// en: 'What were you trying to do? (optional)'
+	String get intentLabel => 'What were you trying to do? (optional)';
+
+	/// en: 'Your name (optional)'
+	String get nameLabel => 'Your name (optional)';
+
+	/// en: 'Attach image'
+	String get attachImage => 'Attach image';
+
+	/// en: '${count} of ${max} attached'
+	String attachImageCount({required Object count, required Object max}) => '${count} of ${max} attached';
+
+	/// en: 'Image ${number}'
+	String imageNumber({required Object number}) => 'Image ${number}';
+
+	/// en: 'Remove image'
+	String get removeImage => 'Remove image';
+
+	/// en: 'Include app log'
+	String get includeLog => 'Include app log';
+
+	/// en: 'Recent log lines help to find the cause. Tokens, passwords and server addresses are removed.'
+	String get includeLogDescription => 'Recent log lines help to find the cause. Tokens, passwords and server addresses are removed.';
+
+	/// en: 'Send'
+	String get send => 'Send';
+
+	/// en: 'Sending…'
+	String get sending => 'Sending…';
+
+	/// en: 'Report sent'
+	String get sentTitle => 'Report sent';
+
+	/// en: 'Thank you! Your report has arrived.'
+	String get sentMessage => 'Thank you! Your report has arrived.';
+
+	/// en: 'Reference'
+	String get reference => 'Reference';
+
+	/// en: 'The server could not be reached. Check your connection and try again — your text is kept.'
+	String get errorUnreachable => 'The server could not be reached. Check your connection and try again — your text is kept.';
+
+	/// en: 'The server did not accept the report.'
+	String get errorRejected => 'The server did not accept the report.';
+
+	/// en: 'The server did not accept the report: ${detail}'
+	String errorRejectedDetail({required Object detail}) => 'The server did not accept the report: ${detail}';
+
+	/// en: 'This build is not allowed to send reports (access key rejected).'
+	String get errorUnauthorized => 'This build is not allowed to send reports (access key rejected).';
+
+	/// en: 'The report is too large. Remove images and try again.'
+	String get errorTooLarge => 'The report is too large. Remove images and try again.';
+
+	/// en: 'Too many reports at the moment. Please try again later.'
+	String get errorThrottled => 'Too many reports at the moment. Please try again later.';
+
+	/// en: 'Too many reports at the moment. Try again in about ${minutes} min.'
+	String errorThrottledMinutes({required Object minutes}) => 'Too many reports at the moment. Try again in about ${minutes} min.';
+
+	/// en: 'The server reported an error (${code}). Please try again later.'
+	String errorServer({required Object code}) => 'The server reported an error (${code}). Please try again later.';
+
+	/// en: 'The report could not be sent. Please try again.'
+	String get errorUnexpected => 'The report could not be sent. Please try again.';
+
+	/// en: 'The report could not be sent (${code}). Please try again.'
+	String errorUnexpectedCode({required Object code}) => 'The report could not be sent (${code}). Please try again.';
+
+	/// en: 'At most ${max} images per report.'
+	String imageLimit({required Object max}) => 'At most ${max} images per report.';
+
+	/// en: 'This file is not a supported image (PNG, JPEG or WebP).'
+	String get imageNotAnImage => 'This file is not a supported image (PNG, JPEG or WebP).';
+
+	/// en: 'This image is too large (max. 8 MB).'
+	String get imageTooLarge => 'This image is too large (max. 8 MB).';
+
+	/// en: 'The image could not be read.'
+	String get imageUnreadable => 'The image could not be read.';
+}
+
 // Path: appIcon.names
 class Translations$appIcon$names$en {
 	Translations$appIcon$names$en.internal(this._root);
@@ -10456,6 +10568,40 @@ extension on Translations {
 			'deepLinks.openAsProfile' => ({required Object name}) => 'Open as ${name}',
 			'deepLinks.copy' => 'Copy',
 			'deepLinks.copied' => 'Link copied',
+			'forkFeedback.reportProblem' => 'Report a problem',
+			'forkFeedback.reportProblemDescription' => 'Send a bug or a wish to the maintainer of this build',
+			'forkFeedback.kindBug' => 'Bug',
+			'forkFeedback.kindWish' => 'Wish',
+			'forkFeedback.descriptionLabel' => 'What happened?',
+			'forkFeedback.descriptionHint' => 'Describe the problem or your wish',
+			'forkFeedback.descriptionRequired' => 'Please describe briefly what happened.',
+			'forkFeedback.intentLabel' => 'What were you trying to do? (optional)',
+			'forkFeedback.nameLabel' => 'Your name (optional)',
+			'forkFeedback.attachImage' => 'Attach image',
+			'forkFeedback.attachImageCount' => ({required Object count, required Object max}) => '${count} of ${max} attached',
+			'forkFeedback.imageNumber' => ({required Object number}) => 'Image ${number}',
+			'forkFeedback.removeImage' => 'Remove image',
+			'forkFeedback.includeLog' => 'Include app log',
+			'forkFeedback.includeLogDescription' => 'Recent log lines help to find the cause. Tokens, passwords and server addresses are removed.',
+			'forkFeedback.send' => 'Send',
+			'forkFeedback.sending' => 'Sending…',
+			'forkFeedback.sentTitle' => 'Report sent',
+			'forkFeedback.sentMessage' => 'Thank you! Your report has arrived.',
+			'forkFeedback.reference' => 'Reference',
+			'forkFeedback.errorUnreachable' => 'The server could not be reached. Check your connection and try again — your text is kept.',
+			'forkFeedback.errorRejected' => 'The server did not accept the report.',
+			'forkFeedback.errorRejectedDetail' => ({required Object detail}) => 'The server did not accept the report: ${detail}',
+			'forkFeedback.errorUnauthorized' => 'This build is not allowed to send reports (access key rejected).',
+			'forkFeedback.errorTooLarge' => 'The report is too large. Remove images and try again.',
+			'forkFeedback.errorThrottled' => 'Too many reports at the moment. Please try again later.',
+			'forkFeedback.errorThrottledMinutes' => ({required Object minutes}) => 'Too many reports at the moment. Try again in about ${minutes} min.',
+			'forkFeedback.errorServer' => ({required Object code}) => 'The server reported an error (${code}). Please try again later.',
+			'forkFeedback.errorUnexpected' => 'The report could not be sent. Please try again.',
+			'forkFeedback.errorUnexpectedCode' => ({required Object code}) => 'The report could not be sent (${code}). Please try again.',
+			'forkFeedback.imageLimit' => ({required Object max}) => 'At most ${max} images per report.',
+			'forkFeedback.imageNotAnImage' => 'This file is not a supported image (PNG, JPEG or WebP).',
+			'forkFeedback.imageTooLarge' => 'This image is too large (max. 8 MB).',
+			'forkFeedback.imageUnreadable' => 'The image could not be read.',
 			_ => null,
 		};
 	}

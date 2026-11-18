@@ -9,6 +9,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import '../../focus/focusable_action_bar.dart';
+import '../../fork_feedback/fork_feedback_config.dart';
+import '../../fork_feedback/fork_feedback_dialog.dart';
 import '../../widgets/dialog_action_button.dart';
 import '../../widgets/app_icon.dart';
 import '../../focus/key_event_utils.dart';
@@ -264,6 +266,11 @@ class _LogsScreenState extends State<LogsScreen> with MountedSetStateMixin {
   }
 
   Future<void> _uploadLogs() async {
+    // Fork builds with their own feedback channel never send logs upstream.
+    if (ForkFeedbackConfig.current.isConfigured) {
+      await showForkFeedbackDialog(context, screen: 'Logs');
+      return;
+    }
     final logText = _formatAllLogs(maxBytes: maxLogUploadBytes);
 
     showLoadingDialog(context);
