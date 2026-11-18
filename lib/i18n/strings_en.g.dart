@@ -6188,6 +6188,9 @@ class Translations$forkFeedback$en {
 	/// en: 'Send a bug or a wish to the maintainer of this build'
 	String get reportProblemDescription => 'Send a bug or a wish to the maintainer of this build';
 
+	/// en: 'The app did not start.'
+	String get crashDescription => 'The app did not start.';
+
 	/// en: 'Bug'
 	String get kindBug => 'Bug';
 
@@ -10570,6 +10573,7 @@ extension on Translations {
 			'deepLinks.copied' => 'Link copied',
 			'forkFeedback.reportProblem' => 'Report a problem',
 			'forkFeedback.reportProblemDescription' => 'Send a bug or a wish to the maintainer of this build',
+			'forkFeedback.crashDescription' => 'The app did not start.',
 			'forkFeedback.kindBug' => 'Bug',
 			'forkFeedback.kindWish' => 'Wish',
 			'forkFeedback.descriptionLabel' => 'What happened?',

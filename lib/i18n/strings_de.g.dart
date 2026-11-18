@@ -2469,6 +2469,7 @@ class _Translations$forkFeedback$de extends Translations$forkFeedback$en {
 	// Translations
 	@override String get reportProblem => 'Problem melden';
 	@override String get reportProblemDescription => 'Fehler oder Wunsch an den Betreuer dieser Version senden';
+	@override String get crashDescription => 'Die App ist nicht gestartet.';
 	@override String get kindBug => 'Fehler';
 	@override String get kindWish => 'Wunsch';
 	@override String get descriptionLabel => 'Was ist passiert?';
@@ -5755,6 +5756,7 @@ extension on TranslationsDe {
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'Der Server hat zu einer nicht unterstützten URL weitergeleitet. Gib die endgültige ${product}-URL direkt ein.',
 			'forkFeedback.reportProblem' => 'Problem melden',
 			'forkFeedback.reportProblemDescription' => 'Fehler oder Wunsch an den Betreuer dieser Version senden',
+			'forkFeedback.crashDescription' => 'Die App ist nicht gestartet.',
 			'forkFeedback.kindBug' => 'Fehler',
 			'forkFeedback.kindWish' => 'Wunsch',
 			'forkFeedback.descriptionLabel' => 'Was ist passiert?',

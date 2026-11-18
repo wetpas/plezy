@@ -2572,6 +2572,7 @@
   "forkFeedback": {
     "reportProblem": "Problem melden",
     "reportProblemDescription": "Fehler oder Wunsch an den Betreuer dieser Version senden",
+    "crashDescription": "Die App ist nicht gestartet.",
     "kindBug": "Fehler",
     "kindWish": "Wunsch",
     "descriptionLabel": "Was ist passiert?",

@@ -50,6 +50,9 @@ Future<void> showForkFeedbackDialog(
   ForkFeedbackDiagnosticsCollector? collector,
   ForkFeedbackImagePicker? imagePicker,
   bool? canPickImages,
+  ForkFeedbackKind kind = ForkFeedbackKind.bug,
+  String? description,
+  String? failureRecord,
 }) async {
   final effectiveConfig = config ?? ForkFeedbackConfig.current;
   if (!effectiveConfig.isConfigured) return;
@@ -65,7 +68,23 @@ Future<void> showForkFeedbackDialog(
       collector: collector ?? ForkFeedbackDiagnosticsCollector(config: effectiveConfig),
       imagePicker: imagePicker ?? pickForkFeedbackImage,
       canPickImages: canPickImages ?? forkFeedbackCanPickImages,
+      initialKind: kind,
+      initialDescription: description,
+      failureRecord: failureRecord,
     ),
+  );
+}
+
+/// Reports a launch that failed the startup gate: kind `crash`, with
+/// [failureRecord] — the already-redacted text the screen shows — attached.
+/// The description is prefilled so the report can be sent as it is.
+Future<void> showForkFeedbackCrashDialog(BuildContext context, {required String failureRecord}) {
+  return showForkFeedbackDialog(
+    context,
+    screen: 'Startup failure',
+    kind: ForkFeedbackKind.crash,
+    description: t.forkFeedback.crashDescription,
+    failureRecord: failureRecord,
   );
 }
 
@@ -102,7 +121,20 @@ class ForkFeedbackDialog extends StatefulWidget {
     required this.collector,
     required this.imagePicker,
     required this.canPickImages,
+    this.initialKind = ForkFeedbackKind.bug,
+    this.initialDescription,
+    this.failureRecord,
   });
+
+  /// [ForkFeedbackKind.crash] fixes the kind: the bug/wish choice is hidden.
+  final ForkFeedbackKind initialKind;
+
+  /// Prefilled description; sending it unchanged is fine.
+  final String? initialDescription;
+
+  /// A failure record that is the subject of the report. Sent whether or
+  /// not the log is included.
+  final String? failureRecord;
 
   final ForkFeedbackAppState appState;
   final ForkFeedbackSender sender;
@@ -115,7 +147,9 @@ class ForkFeedbackDialog extends StatefulWidget {
 }
 
 class _ForkFeedbackDialogState extends State<ForkFeedbackDialog> with ControllerDisposerMixin {
-  late final TextEditingController _descriptionController = createTextEditingController();
+  late final TextEditingController _descriptionController = createTextEditingController(
+    text: widget.initialDescription,
+  );
   late final TextEditingController _intentController = createTextEditingController();
   late final TextEditingController _nameController = createTextEditingController(text: widget.appState.profileName);
 
@@ -137,7 +171,10 @@ class _ForkFeedbackDialogState extends State<ForkFeedbackDialog> with Controller
   late final Future<Map<String, Object?>> _facts;
   late final List<String> _logsAtOpen;
 
-  ForkFeedbackKind _kind = ForkFeedbackKind.bug;
+  late ForkFeedbackKind _kind = widget.initialKind;
+
+  /// A crash report has nothing to choose and is ready to send as opened.
+  bool get _isCrash => widget.initialKind == ForkFeedbackKind.crash;
   bool _includeLog = true;
   final List<ForkFeedbackImage> _images = [];
 
@@ -157,7 +194,7 @@ class _ForkFeedbackDialogState extends State<ForkFeedbackDialog> with Controller
   /// A desktop has a real keyboard, so typing can start at once. Everywhere
   /// else the form opens on its first control: focusing the text field would
   /// raise a keyboard over the form before the user has seen it.
-  bool get _startInDescription => PlatformDetector.isDesktopOS() && !PlatformDetector.isTV();
+  bool get _startInDescription => !_isCrash && PlatformDetector.isDesktopOS() && !PlatformDetector.isTV();
 
   @override
   void initState() {
@@ -203,7 +240,7 @@ class _ForkFeedbackDialogState extends State<ForkFeedbackDialog> with Controller
   void _updateDraft() {
     final hasDraft =
         _reference == null &&
-        (_descriptionController.text.trim().isNotEmpty ||
+        (_descriptionController.text.trim() != (widget.initialDescription ?? '').trim() ||
             _intentController.text.trim().isNotEmpty ||
             _images.isNotEmpty);
     if (hasDraft == _hasDraft || !mounted) return;
@@ -335,7 +372,7 @@ class _ForkFeedbackDialogState extends State<ForkFeedbackDialog> with Controller
       reporterName: _nameController.text,
       logs: _includeLog ? _logsAtOpen : const [],
       logsAfter: _includeLog ? _safeLogs(() => widget.collector.logsAfter(_openedAt)) : const [],
-      startupFailure: _includeLog ? widget.collector.startupFailure() : null,
+      startupFailure: widget.failureRecord ?? (_includeLog ? widget.collector.startupFailure() : null),
     );
 
     final result = await widget.sender.send(
@@ -413,31 +450,33 @@ class _ForkFeedbackDialogState extends State<ForkFeedbackDialog> with Controller
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _buildKindChip(
-                  key: ForkFeedbackKeys.kindBug,
-                  kind: ForkFeedbackKind.bug,
-                  label: t.forkFeedback.kindBug,
-                  icon: Symbols.bug_report_rounded,
-                  focusNode: _bugFocus,
-                  onNavigateLeft: _stay,
-                  onNavigateRight: _wishFocus.requestFocus,
-                ),
-                _buildKindChip(
-                  key: ForkFeedbackKeys.kindWish,
-                  kind: ForkFeedbackKind.idea,
-                  label: t.forkFeedback.kindWish,
-                  icon: Symbols.lightbulb_rounded,
-                  focusNode: _wishFocus,
-                  onNavigateLeft: _bugFocus.requestFocus,
-                  onNavigateRight: _stay,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
+            if (!_isCrash) ...[
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _buildKindChip(
+                    key: ForkFeedbackKeys.kindBug,
+                    kind: ForkFeedbackKind.bug,
+                    label: t.forkFeedback.kindBug,
+                    icon: Symbols.bug_report_rounded,
+                    focusNode: _bugFocus,
+                    onNavigateLeft: _stay,
+                    onNavigateRight: _wishFocus.requestFocus,
+                  ),
+                  _buildKindChip(
+                    key: ForkFeedbackKeys.kindWish,
+                    kind: ForkFeedbackKind.idea,
+                    label: t.forkFeedback.kindWish,
+                    icon: Symbols.lightbulb_rounded,
+                    focusNode: _wishFocus,
+                    onNavigateLeft: _bugFocus.requestFocus,
+                    onNavigateRight: _stay,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
             FocusableTextField(
               key: ForkFeedbackKeys.description,
               controller: _descriptionController,
@@ -462,7 +501,7 @@ class _ForkFeedbackDialogState extends State<ForkFeedbackDialog> with Controller
               },
               // A multiline field keeps Up/Down for its caret unless both
               // exits are wired, which would trap a D-pad inside it.
-              onNavigateUp: () => _selectedKindFocus.requestFocus(),
+              onNavigateUp: _isCrash ? _stay : () => _selectedKindFocus.requestFocus(),
               onNavigateDown: _intentFocus.requestFocus,
               onNavigateLeft: _stay,
               onNavigateRight: _stay,
@@ -583,6 +622,7 @@ class _ForkFeedbackDialogState extends State<ForkFeedbackDialog> with Controller
         DialogActionButton(
           key: ForkFeedbackKeys.send,
           focusNode: _sendFocus,
+          autofocus: _isCrash,
           isPrimary: true,
           onPressed: _submit,
           onNavigateUp: _includeLogFocus.requestFocus,
@@ -611,7 +651,7 @@ class _ForkFeedbackDialogState extends State<ForkFeedbackDialog> with Controller
     return FocusableButton(
       key: key,
       focusNode: focusNode,
-      autofocus: !_startInDescription && kind == ForkFeedbackKind.bug,
+      autofocus: !_startInDescription && kind == _kind,
       onPressed: () => _setKind(kind),
       onNavigateUp: _stay,
       onNavigateLeft: onNavigateLeft,

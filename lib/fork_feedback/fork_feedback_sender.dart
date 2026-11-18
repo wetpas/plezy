@@ -12,7 +12,10 @@ import 'fork_feedback_config.dart';
 /// The server's `kind` choices this client offers.
 enum ForkFeedbackKind {
   bug('bug'),
-  idea('idea');
+  idea('idea'),
+
+  /// Not offered as a choice: set by the startup-failure screen.
+  crash('crash');
 
   const ForkFeedbackKind(this.wireValue);
 

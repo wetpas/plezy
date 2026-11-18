@@ -2572,6 +2572,7 @@
   "forkFeedback": {
     "reportProblem": "Report a problem",
     "reportProblemDescription": "Send a bug or a wish to the maintainer of this build",
+    "crashDescription": "The app did not start.",
     "kindBug": "Bug",
     "kindWish": "Wish",
     "descriptionLabel": "What happened?",
