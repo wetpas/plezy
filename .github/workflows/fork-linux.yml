@@ -1,0 +1,154 @@
+name: Fork – Linux-Build
+
+# Nur für den Fork wetpas/plezy. Baut „Plezy Fork“ als AppImage (CachyOS, Mint, …) und als
+# Tarball. Eigene App-ID com.edde746.plezy.fork → eigene Einstellungen/Daten neben einer
+# offiziellen Plezy. Ablauf nach dem Linux-Job in build.yml, ohne Releases, Sentry,
+# Symbol-Upload, Update-Info und ohne deb/rpm/pacman/Flatpak.
+
+on:
+  push:
+    branches: [wetpas]
+  workflow_dispatch:
+
+concurrency:
+  group: fork-linux-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: "3.47.1"
+  FORK_APP_ID: com.edde746.plezy.fork
+  FORK_APP_LABEL: Plezy Fork
+  LINUX_APT_PACKAGES: >
+    clang cmake meson ninja-build pkg-config nasm libgtk-3-dev libevdev-dev liblzma-dev
+    libstdc++-12-dev libasound2-dev libass-dev libfreetype-dev libfontconfig-dev libfribidi-dev
+    libharfbuzz-dev libepoxy-dev libegl-dev libgl-dev libgnutls28-dev libpipewire-0.3-dev
+    libva-dev libvdpau-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev
+    libxss-dev libxpresent-dev libxkbcommon-dev libpulse-dev libdbus-1-dev libdrm-dev
+    libdisplay-info-dev libgbm-dev libwayland-dev wayland-protocols liblcms2-dev libmujs-dev liblua5.2-dev
+    build-essential libarchive-tools imagemagick libcurl4-openssl-dev desktop-file-utils zstd
+
+jobs:
+  linux-x64:
+    if: github.repository == 'wetpas/plezy'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+          pub-cache: false
+
+      - name: Cache Pub
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: ~/.pub-cache
+          key: fork-${{ runner.os }}-${{ runner.arch }}-pub-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
+
+      - name: Install Linux dependencies
+        shell: bash
+        run: |
+          read -r -a packages <<< "$LINUX_APT_PACKAGES"
+          for attempt in 1 2 3; do
+            if sudo apt-get update -o Acquire::Retries=3 && sudo apt-get install -y -o Acquire::Retries=3 "${packages[@]}"; then
+              exit 0
+            fi
+            sudo apt-get clean
+            sudo rm -rf /var/lib/apt/lists/*
+            sleep $((attempt * 15))
+          done
+          exit 1
+
+      - name: Cache libmpv prefix
+        id: libmpv-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: libmpv-prefix
+          key: fork-libmpv-${{ runner.arch }}-${{ hashFiles('mpv-build.lock.json') }}
+
+      - name: Fetch libmpv
+        if: steps.libmpv-cache.outputs.cache-hit != 'true'
+        run: python3 scripts/fetch_linux_libmpv.py --dest libmpv-prefix
+
+      - name: Install dependencies
+        run: flutter pub get --enforce-lockfile --no-example
+
+      - name: Eigene App-Identität setzen
+        shell: bash
+        run: |
+          set -euo pipefail
+          swap() { # Datei, alt, neu – bricht ab, wenn upstream die Stelle geändert hat
+            grep -qF -- "$2" "$1" || { echo "::error file=$1::'$2' nicht gefunden – upstream hat sich geändert"; exit 1; }
+            sed -i "s|$2|$3|g" "$1"
+          }
+          swap linux/CMakeLists.txt 'set(APPLICATION_ID "com.edde746.plezy")' "set(APPLICATION_ID \"$FORK_APP_ID\")"
+          swap linux/packaging/com.edde746.plezy.desktop 'Name=Plezy' "Name=$FORK_APP_LABEL"
+
+      - name: Build Linux x64
+        env:
+          PKG_CONFIG_PATH: ${{ github.workspace }}/libmpv-prefix/lib/pkgconfig:${{ github.workspace }}/libmpv-prefix/lib/x86_64-linux-gnu/pkgconfig
+          FB_URL: ${{ secrets.FORK_FEEDBACK_URL }}
+          FB_KEY: ${{ secrets.FORK_FEEDBACK_KEY }}
+        run: >-
+          flutter build linux --release
+          --dart-define=GIT_COMMIT=${{ github.sha }}
+          --dart-define=SUPPORTER_MODE=unlocked
+          --dart-define=FORK_FEEDBACK_URL="$FB_URL"
+          --dart-define=FORK_FEEDBACK_KEY="$FB_KEY"
+
+      - name: Bundle zusammenstellen
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUNDLE_DIR=build/linux/x64/release/bundle
+          test -d "$BUNDLE_DIR"
+          echo "BUNDLE_DIR=$BUNDLE_DIR" >> "$GITHUB_ENV"
+          LIBMPV_DIR=$(dirname "$(find libmpv-prefix -name 'libmpv.so' | head -1)")
+          cp -a "$LIBMPV_DIR"/libmpv.so* "$BUNDLE_DIR/lib/"
+          cp -a libmpv-prefix/lib/libshaderc_shared.so* "$BUNDLE_DIR/lib/"
+          bash linux/packaging/bundle-libs.sh "$BUNDLE_DIR"
+          cp linux/packaging/plezy.sh "$BUNDLE_DIR/plezy.sh"
+          python3 linux/packaging/check-bundle-host-deps.py "$BUNDLE_DIR"
+
+      - name: Build AppImage
+        shell: bash
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+        run: |
+          set -euo pipefail
+          bash linux/packaging/fetch-appimage-tools.sh x64 "$RUNNER_TEMP/appimage"
+          VERSION=$(python3 scripts/pubspec_version.py pubspec.yaml)
+          export VERSION=${VERSION%%+*}
+          APPIMAGETOOL="$RUNNER_TEMP/appimage/appimagetool" \
+          RUNTIME_FILE="$RUNNER_TEMP/appimage/runtime" \
+          bash linux/packaging/build-appimage.sh "$BUNDLE_DIR" x64 "$GITHUB_WORKSPACE"
+          mkdir -p out
+          mv "$GITHUB_WORKSPACE/plezy-linux-x64.AppImage" out/plezy-fork-linux-x64.AppImage
+          (cd "$BUNDLE_DIR" && tar -czf "$GITHUB_WORKSPACE/out/plezy-fork-linux-x64.tar.gz" *)
+          ls -lh out
+
+      # archive: false → direkt als Datei herunterladbar, ohne Zip.
+      - name: Upload AppImage
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          path: out/plezy-fork-linux-x64.AppImage
+          archive: false
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload Tarball
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          path: out/plezy-fork-linux-x64.tar.gz
+          archive: false
+          retention-days: 14
+          if-no-files-found: error

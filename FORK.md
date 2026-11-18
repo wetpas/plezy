@@ -27,6 +27,13 @@ GitHub-Login nötig).
 Signatur: Secrets `FORK_ANDROID_KEYSTORE_B64` und `FORK_ANDROID_KEYSTORE_PASSWORD`. Ohne sie wird mit einem
 wechselnden Debug-Schlüssel signiert und jedes Update braucht eine Neuinstallation.
 
+## Linux (CachyOS, Mint, …)
+
+`.github/workflows/fork-linux.yml` baut bei jedem Push auf `wetpas` eine **AppImage** (`plezy-fork-linux-x64.AppImage`)
+und einen Tarball. Eigene App-ID `com.edde746.plezy.fork` → eigene Daten unter `~/.local/share/com.edde746.plezy.fork`,
+läuft neben einer offiziellen Plezy. Starten: `chmod +x plezy-fork-linux-x64.AppImage && ./plezy-fork-linux-x64.AppImage`
+(ohne FUSE 2: `--appimage-extract-and-run` anhängen).
+
 ## Rücksicht aufs Original
 
 - Keine Releases unter dem Namen „Plezy“, keine Plezy-Dienste (`bugs.plezy.app`, `ice.plezy.app`) bei Weitergabe,
