@@ -10,6 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plezy/connection/connection_registry.dart';
 import 'package:plezy/database/app_database.dart';
+import 'package:plezy/fork_feedback/fork_feedback_config.dart';
+import 'package:plezy/fork_feedback/fork_feedback_dialog.dart';
 import 'package:plezy/i18n/strings.g.dart';
 import 'package:plezy/media/media_backend.dart';
 import 'package:plezy/media/media_kind.dart';
@@ -117,6 +119,30 @@ void main() {
     expect(find.text('Maestro Movies'), findsNothing, reason: 'system back dismisses the sheet');
     expect(find.text(t.settings.services), findsOneWidget, reason: 'the settings route remains current');
     expect(find.text('Settings launcher'), findsNothing, reason: 'system back must not pop the settings route');
+  });
+
+  // Fork: the "Report a problem" row exists only in builds with a feedback channel.
+  testWidgets('fork feedback row follows the build configuration and opens the dialog', (tester) async {
+    addTearDown(() => ForkFeedbackConfig.debugOverride = null);
+    var harness = await _pumpSettingsScreen(tester);
+    expect(find.text(t.forkFeedback.reportProblem), findsNothing);
+    expect(find.text(t.settings.about), findsOneWidget);
+    await harness.dispose(tester);
+
+    ForkFeedbackConfig.debugOverride = const ForkFeedbackConfig(baseUrl: 'https://vibe.example.org', apiKey: 'key');
+    harness = await _pumpSettingsScreen(tester);
+    addTearDown(() => harness.dispose(tester));
+    final row = find.widgetWithText(ForkFeedbackSettingsTile, t.forkFeedback.reportProblem);
+    expect(row, findsOneWidget);
+    expect(find.text(t.settings.about), findsOneWidget);
+
+    await tester.ensureVisible(row);
+    await _pumpUi(tester);
+    await tester.tap(row);
+    await _pumpUi(tester);
+
+    expect(find.byType(ForkFeedbackDialog), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('migrated rows retain the shared compact row geometry and activation', (tester) async {

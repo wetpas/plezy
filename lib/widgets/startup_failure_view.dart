@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../focus/focusable_button.dart';
+import '../fork_feedback/fork_feedback_config.dart';
+import '../fork_feedback/fork_feedback_dialog.dart';
 import '../i18n/strings.g.dart';
 import '../services/app_exit_service.dart';
 import '../services/log_upload_service.dart';
@@ -97,6 +99,11 @@ class _StartupFailureViewState extends State<StartupFailureView> {
   }
 
   Future<void> _uploadDetails() async {
+    // Fork builds with their own feedback channel never upload upstream.
+    if (ForkFeedbackConfig.current.isConfigured) {
+      await showForkFeedbackCrashDialog(context, failureRecord: widget.failure.describe());
+      return;
+    }
     setState(() => _uploading = true);
     try {
       final id = await uploadDiagnosticText(widget.failure.describe());

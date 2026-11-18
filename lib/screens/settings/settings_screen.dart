@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../focus/focus_memory_tracker.dart';
+import '../../fork_feedback/fork_feedback_dialog.dart';
 import '../../focus/focusable_text_field.dart';
 import '../../focus/input_mode_tracker.dart';
 import '../../i18n/strings.g.dart';
@@ -243,6 +244,8 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
                   const SizedBox(height: 24),
                   SettingsGroup(
                     children: [
+                      if (ForkFeedbackSettingsTile.isAvailable)
+                        ForkFeedbackSettingsTile(focusNode: _focusTracker.get('fork_feedback')),
                       SettingNavigationTile(
                         focusNode: _focusTracker.get(_kAbout),
                         icon: Symbols.info_rounded,
