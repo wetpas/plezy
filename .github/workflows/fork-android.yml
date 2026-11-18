@@ -98,8 +98,17 @@ jobs:
           printf '%s' "$KS_B64" | base64 --decode > android/app/fork-release.jks
           printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=fork\nstoreFile=fork-release.jks\n' "$KS_PW" "$KS_PW" > android/key.properties
 
+      # Fehlermeldungen gehen an den eigenen VibeStream-Server. Adresse und Schlüssel (darf nur
+      # Meldungen anlegen) kommen aus Secrets; fehlen sie, blendet die App die Funktion aus.
       - name: Build APKs
-        run: flutter build apk --release --split-per-abi --dart-define=GIT_COMMIT=${{ github.sha }}
+        env:
+          FB_URL: ${{ secrets.FORK_FEEDBACK_URL }}
+          FB_KEY: ${{ secrets.FORK_FEEDBACK_KEY }}
+        run: >-
+          flutter build apk --release --split-per-abi
+          --dart-define=GIT_COMMIT=${{ github.sha }}
+          --dart-define=FORK_FEEDBACK_URL="$FB_URL"
+          --dart-define=FORK_FEEDBACK_KEY="$FB_KEY"
 
       - name: Signatur entfernen
         if: always()
