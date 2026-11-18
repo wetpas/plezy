@@ -93,6 +93,7 @@ class TranslationsDe extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$seerr$de seerr = _Translations$seerr$de._(_root);
 	@override late final _Translations$services$de services = _Translations$services$de._(_root);
 	@override late final _Translations$addServer$de addServer = _Translations$addServer$de._(_root);
+	@override late final _Translations$forkUpdate$de forkUpdate = _Translations$forkUpdate$de._(_root);
 }
 
 // Path: app
@@ -2457,6 +2458,20 @@ class _Translations$addServer$de extends Translations$addServer$en {
 	@override String redirectDifferentHost({required Object product}) => 'Der Server hat zu einem anderen Host weitergeleitet. Gib die endgültige ${product}-URL direkt ein.';
 	@override String get redirectInsecure => 'Der Server hat von HTTPS zu einer unsicheren URL weitergeleitet';
 	@override String redirectUnsupportedEnterFinal({required Object product}) => 'Der Server hat zu einer nicht unterstützten URL weitergeleitet. Gib die endgültige ${product}-URL direkt ein.';
+}
+
+// Path: forkUpdate
+class _Translations$forkUpdate$de extends Translations$forkUpdate$en {
+	_Translations$forkUpdate$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get install => 'Installieren';
+	@override String get retry => 'Erneut versuchen';
+	@override String downloading({required Object percent}) => 'Wird heruntergeladen … ${percent} %';
+	@override String get openingInstaller => 'Installer wird geöffnet …';
+	@override String get failed => 'Das Update ließ sich nicht herunterladen. Verbindung prüfen und erneut versuchen.';
 }
 
 // Path: appIcon.names
@@ -5709,6 +5724,11 @@ extension on TranslationsDe {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'Der Server hat zu einem anderen Host weitergeleitet. Gib die endgültige ${product}-URL direkt ein.',
 			'addServer.redirectInsecure' => 'Der Server hat von HTTPS zu einer unsicheren URL weitergeleitet',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'Der Server hat zu einer nicht unterstützten URL weitergeleitet. Gib die endgültige ${product}-URL direkt ein.',
+			'forkUpdate.install' => 'Installieren',
+			'forkUpdate.retry' => 'Erneut versuchen',
+			'forkUpdate.downloading' => ({required Object percent}) => 'Wird heruntergeladen … ${percent} %',
+			'forkUpdate.openingInstaller' => 'Installer wird geöffnet …',
+			'forkUpdate.failed' => 'Das Update ließ sich nicht herunterladen. Verbindung prüfen und erneut versuchen.',
 			_ => null,
 		};
 	}

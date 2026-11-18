@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:auto_updater/auto_updater.dart';
+import 'package:plezy/fork_update/fork_update.dart';
 import 'package:plezy/utils/app_logger.dart';
 import 'package:plezy/utils/app_version.dart';
 import 'package:plezy/utils/media_server_http_client.dart';
@@ -21,14 +22,14 @@ class UpdateService {
   static const String _keySkippedVersion = 'update_skipped_version';
   static const String _keyLastCheckTime = 'update_last_check_time';
 
-  // Check cooldown: 6 hours
-  static const Duration _checkCooldown = Duration(hours: 6);
+  // Check cooldown: 6 hours (fork builds: see ForkUpdate.checkCooldown)
+  static Duration get _checkCooldown => ForkUpdate.enabled ? ForkUpdate.checkCooldown : const Duration(hours: 6);
 
   static bool _nativeUpdaterInitialized = false;
 
   /// Check if update checking is enabled via build flag
   static bool get isUpdateCheckEnabled {
-    return const bool.fromEnvironment('ENABLE_UPDATE_CHECK', defaultValue: false);
+    return ForkUpdate.enabled || const bool.fromEnvironment('ENABLE_UPDATE_CHECK', defaultValue: false);
   }
 
   /// Whether any in-app update path applies to this install.
@@ -41,7 +42,7 @@ class UpdateService {
   /// Whether the native auto_updater (Sparkle/WinSparkle) should be used.
   /// True on macOS (non-Homebrew) and installed Windows (has uninstaller).
   static bool get useNativeUpdater {
-    if (!isUpdateCheckAvailable) return false;
+    if (!isUpdateCheckAvailable || ForkUpdate.enabled) return false;
     if (Platform.isMacOS) return !_isHomebrewInstall();
     if (Platform.isWindows) return _isInstalledApp() && !_isWingetInstall();
     return false;
@@ -152,6 +153,13 @@ class UpdateService {
 
       if (respectCooldown) {
         await _updateLastCheckTime();
+      }
+
+      // Fork builds update from the fork's own releases, never from the original's.
+      if (ForkUpdate.enabled) {
+        final info = await ForkUpdate.check(client ?? httpClient, currentVersion: currentVersion);
+        if (info == null || await getSkippedVersion() == info['latestVersion']) return null;
+        return info;
       }
 
       final response = await (client ?? httpClient).get(

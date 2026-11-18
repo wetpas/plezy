@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../fork_update/fork_update.dart';
+import '../fork_update/fork_update_dialog.dart';
 import '../i18n/strings.g.dart';
 import '../services/update_service.dart';
 import '../widgets/dialog_action_button.dart';
@@ -13,6 +15,15 @@ Future<void> showUpdateAvailableDialog(
   required String dismissLabel,
   bool showSkipVersion = false,
 }) {
+  if (ForkUpdate.enabled) {
+    return showForkUpdateDialog(
+      context,
+      updateInfo,
+      title: title,
+      dismissLabel: dismissLabel,
+      showSkipVersion: showSkipVersion,
+    );
+  }
   return showScopedDialog<void>(
     context: context,
     builder: (dialogContext) {

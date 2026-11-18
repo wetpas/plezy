@@ -95,6 +95,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$services$en services = Translations$services$en.internal(_root);
 	late final Translations$addServer$en addServer = Translations$addServer$en.internal(_root);
 	late final Translations$deepLinks$en deepLinks = Translations$deepLinks$en.internal(_root);
+	late final Translations$forkUpdate$en forkUpdate = Translations$forkUpdate$en.internal(_root);
 }
 
 // Path: app
@@ -6173,6 +6174,30 @@ class Translations$deepLinks$en {
 	String get copied => 'Link copied';
 }
 
+// Path: forkUpdate
+class Translations$forkUpdate$en {
+	Translations$forkUpdate$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Install'
+	String get install => 'Install';
+
+	/// en: 'Try again'
+	String get retry => 'Try again';
+
+	/// en: 'Downloading … ${percent}%'
+	String downloading({required Object percent}) => 'Downloading … ${percent}%';
+
+	/// en: 'Opening the installer …'
+	String get openingInstaller => 'Opening the installer …';
+
+	/// en: 'The update could not be downloaded. Check the connection and try again.'
+	String get failed => 'The update could not be downloaded. Check the connection and try again.';
+}
+
 // Path: appIcon.names
 class Translations$appIcon$names$en {
 	Translations$appIcon$names$en.internal(this._root);
@@ -10456,6 +10481,11 @@ extension on Translations {
 			'deepLinks.openAsProfile' => ({required Object name}) => 'Open as ${name}',
 			'deepLinks.copy' => 'Copy',
 			'deepLinks.copied' => 'Link copied',
+			'forkUpdate.install' => 'Install',
+			'forkUpdate.retry' => 'Try again',
+			'forkUpdate.downloading' => ({required Object percent}) => 'Downloading … ${percent}%',
+			'forkUpdate.openingInstaller' => 'Opening the installer …',
+			'forkUpdate.failed' => 'The update could not be downloaded. Check the connection and try again.',
 			_ => null,
 		};
 	}

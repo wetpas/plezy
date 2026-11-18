@@ -2568,5 +2568,12 @@
     "openAsProfile": "",
     "copy": "",
     "copied": ""
+  },
+  "forkUpdate": {
+    "install": "Installieren",
+    "retry": "Erneut versuchen",
+    "downloading": "Wird heruntergeladen … ${percent} %",
+    "openingInstaller": "Installer wird geöffnet …",
+    "failed": "Das Update ließ sich nicht herunterladen. Verbindung prüfen und erneut versuchen."
   }
 }

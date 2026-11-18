@@ -2568,5 +2568,12 @@
     "openAsProfile": "Open as ${name}",
     "copy": "Copy",
     "copied": "Link copied"
+  },
+  "forkUpdate": {
+    "install": "Install",
+    "retry": "Try again",
+    "downloading": "Downloading … ${percent}%",
+    "openingInstaller": "Opening the installer …",
+    "failed": "The update could not be downloaded. Check the connection and try again."
   }
 }
